@@ -1,0 +1,8 @@
+TTS
+moviepy
+pysrt
+deepl
+openai
+pillow
+python-dotenv
+google-api-python-client
