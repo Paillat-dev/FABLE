@@ -21,7 +21,11 @@ async def main():
     subject = int(input("Which subject do you want to generate ideas for? (enter the number): "))
     subject = subjects[subject]
     subjectdirpath = "videos/" + subject[:25].replace(" ", "_").replace(":", "")
-    if not os.path.exists(subjectdirpath): os.makedirs(subjectdirpath)
+    if not os.path.exists(subjectdirpath): 
+        os.makedirs(subjectdirpath)
+        input("It looks like it is the first time you are generating ideas for this subject. The requiered folder has been created. Press enter to continue.")
+        input("Please put all the requiered google credentials files in that folder. Press enter to continue.")
+        input("Please put a file called bcg.png in that folder. It will be used as the background of the thumbnails. Press enter to continue.")
     if input("Do you want to generate new ideas? (y/n)") == "y":
         await generate_ideas(subjectdirpath, subject)
     with open(subjectdirpath + '/ideas.json', 'r', encoding='utf-8') as f:
