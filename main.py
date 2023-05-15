@@ -11,11 +11,17 @@ from generators.miniature import generate_miniature
 logging.basicConfig(level=logging.INFO)
 
 async def main():
+    with open('env/subjects.txt', 'r', encoding='utf-8') as f:
+        subjects = f.read().splitlines()
+        f.close()
+    for i in range(len(subjects)):
+        print(str(i) + ". " + subjects[i])
+    subject = int(input("Which subject do you want to generate ideas for? (enter the number): "))
+    subject = subjects[subject]
+    subjectdirpath = subject[:25].replace(" ", "_").replace(":", "")
+    if not os.path.exists(subjectdirpath): os.makedirs(subjectdirpath)
     if input("Do you want to generate new ideas? (y/n)") == "y":
-        ideas = await generate_ideas()
-        if not os.path.exists('ideas'): os.makedirs('ideas')
-        with open('ideas/ideas.json', 'w', encoding='utf-8') as f:
-            f.write(ideas)
+        await generate_ideas(subjectdirpath)
     with open('ideas/ideas.json', 'r', encoding='utf-8') as f:
         ideas = json.load(f)
         f.close()
@@ -26,7 +32,7 @@ async def main():
     title = idea['title']
     title = title[:25]
     i = 0
-    path = "videos/" + title
+    path = subjectdirpath + "/" + title
     path = path.replace(" ", "_").replace(":", "")
     if not os.path.exists(path + "/script.json"):
         script = await generate_script(idea['title'], idea['description'])
