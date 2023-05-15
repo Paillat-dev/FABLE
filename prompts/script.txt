@@ -27,6 +27,10 @@ Your video will be detailed, long and very complete. Here is an example:
 {
   "spoken":"This is a latex formula wich is very important. It is the formula of the integral of x squared from 0 to infinity. You can see it on the screen.",
   "markdown":"$$\n\\int_0^\\infty x^2 dx\n$$"
+},
+{
+  "spoken":"tHanks for watching this video. If you liked it, please like, share and subscribe. See you in the next video.",
+  "image":"thanks+goodbye"
 }
 ]
 

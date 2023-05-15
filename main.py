@@ -7,10 +7,12 @@ from generators.ideas import generate_ideas
 from generators.script import generate_script
 from generators.montage import mount, prepare, translate
 from generators.miniature import generate_miniature
+from generators.uploader import upload_video
 
 logging.basicConfig(level=logging.INFO)
 
 async def main():
+    if not os.path.exists('videos'): os.makedirs('videos')
     with open('env/subjects.txt', 'r', encoding='utf-8') as f:
         subjects = f.read().splitlines()
         f.close()
@@ -18,11 +20,11 @@ async def main():
         print(str(i) + ". " + subjects[i])
     subject = int(input("Which subject do you want to generate ideas for? (enter the number): "))
     subject = subjects[subject]
-    subjectdirpath = subject[:25].replace(" ", "_").replace(":", "")
+    subjectdirpath = "videos/" + subject[:25].replace(" ", "_").replace(":", "")
     if not os.path.exists(subjectdirpath): os.makedirs(subjectdirpath)
     if input("Do you want to generate new ideas? (y/n)") == "y":
-        await generate_ideas(subjectdirpath)
-    with open('ideas/ideas.json', 'r', encoding='utf-8') as f:
+        await generate_ideas(subjectdirpath, subject)
+    with open(subjectdirpath + '/ideas.json', 'r', encoding='utf-8') as f:
         ideas = json.load(f)
         f.close()
     for i in range(len(ideas)):
@@ -55,6 +57,7 @@ async def main():
         f.write(f"Titre: {transtitle}\nDescription: {transdesc}\nCrédits musicaux: {credits}")
         f.close()
     generate_miniature(path, title=idea['title'], description=idea['description'])
+    upload_video(path, idea['title'], idea['description'], 28, "", "private", subjectdirpath)
     print(f"Your video is ready! You can find it in {path}.")
 
 if __name__ == "__main__":

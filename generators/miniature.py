@@ -61,7 +61,15 @@ def generate_miniature(path, title, description):
     generate_image(path, text1, text2)
 
 def generate_image(path, text1, text2):
-    bcg = Image.open("bcg.png")
+    path_to_bcg = path.split("/")[:-1]
+    path_to_bcg = "/".join(path_to_bcg)
+    print(path_to_bcg)
+    if not os.path.exists(f"{path_to_bcg}/bcg.png"):
+        input("bcg.png not found. Please put bcg.png in the same folder as the video."+path_to_bcg)
+        if not os.path.exists(f"{path_to_bcg}/bcg.png"):
+            input("bcg.png still not found. Exiting.")
+            exit()
+    bcg = Image.open(f"{path_to_bcg}/bcg.png")
     img = Image.new('RGBA', (1920, 1080))
     img, textcolor1, textcolor2 = rand_gradient(img)
     draw = ImageDraw.Draw(img)
@@ -108,5 +116,3 @@ def generate_image(path, text1, text2):
         img.paste(imgtext2, (0, 0), imgtext2)
     img.save(path + "/miniature.png")
     return path + "/miniature.png"
-
-generate_image("test", "Master python loops", "Effortlessly")

@@ -28,7 +28,8 @@ RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 
 CLIENT_SECRETS_FILE = 'env/client_secret.json'
 
-SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'POST https://www.googleapis.com/upload/youtube/v3/thumbnails/set', 'https://www.googleapis.com/auth/youtube.force-ssl']
+#SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/upload/youtube/v3/thumbnails/set', 'https://www.googleapis.com/auth/youtube.force-ssl']
+SCOPES = ['https://www.googleapis.com/auth/youtube']
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
 
@@ -36,9 +37,9 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 
 
 # Authorize the request and store authorization credentials.
-def get_authenticated_service():
-    if os.path.exists('env/credentials.json'):
-        with open('env/credentials.json') as json_file:
+def get_authenticated_service(credentialsPath=""):
+    if os.path.exists(f'{credentialsPath}/credentials.json'):
+        with open(f'{credentialsPath}/credentials.json') as json_file:
             data = json.load(json_file)
             credentials = google.oauth2.credentials.Credentials(
                 token=data['token'],
@@ -52,7 +53,7 @@ def get_authenticated_service():
         flow = InstalledAppFlow.from_client_secrets_file(
             CLIENT_SECRETS_FILE, SCOPES)
         credentials = flow.run_local_server()
-        with open('env/credentials.json', 'w') as outfile:
+        with open(f'{credentialsPath}/credentials.json', 'w') as outfile:
             outfile.write(credentials.to_json())
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
@@ -67,10 +68,12 @@ def initialize_upload(youtube, options):
             title=options['title'],
             description=options['description'],
             tags=tags,
-            categoryId=options['category']
+            categoryId=options['category'],
+            defaultLanguage='en'
         ),
         status=dict(
-            privacyStatus=options['privacyStatus']
+            privacyStatus=options['privacyStatus'],
+            selfDeclaredMadeForKids=False
         )
     )
 
@@ -81,7 +84,8 @@ def initialize_upload(youtube, options):
         media_body=MediaFileUpload(options['file'], chunksize=-1, resumable=True)
     )
 
-    resumable_upload(insert_request)
+    videoid = resumable_upload(insert_request)
+    return videoid
 
 
 def resumable_upload(request):
@@ -96,6 +100,7 @@ def resumable_upload(request):
                 if 'id' in response:
                     print('Video id "%s" was successfully uploaded.' %
                           response['id'])
+                    return response['id']
                 else:
                     exit('The upload failed with an unexpected response: %s' % response)
         except HttpError as e:
@@ -118,20 +123,25 @@ def resumable_upload(request):
             print('Sleeping %f seconds and then retrying...' % sleep_seconds)
             time.sleep(sleep_seconds)
 
-
-if __name__ == '__main__':
-    sample_options = {
-        'file': './test.mp4',
-        'title': 'Test Title',
-        'description': 'Test Description',
-        'category': 22,
-        'keywords': 'test, video',
-        'privacyStatus': 'private'
+def upload_video(path, title, description, category, keywords, privacyStatus='private', credentials_path=""):
+    options = {
+        'file': path +"/montage.mp4",
+        'title': title,
+        'description': description,
+        'category': category,
+        'keywords': keywords,
+        'privacyStatus': privacyStatus
     }
-
-    youtube = get_authenticated_service()
-
+    youtube = get_authenticated_service(credentials_path)
     try:
-        initialize_upload(youtube, sample_options)
+        videoid = initialize_upload(youtube, options)
     except HttpError as e:
         print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
+    upload_thumbnail(videoid, path + "/miniature.png", credentials_path)
+
+def upload_thumbnail(video_id, file, credentials_path=""):
+    youtube = get_authenticated_service(credentials_path)
+    youtube.thumbnails().set(
+        videoId=video_id,
+        media_body=file
+    ).execute()

@@ -6,12 +6,12 @@ Here is an example of the output:
 ```
 [
     {
-        "title": "Python Tutorial for Beginners",
-        "description": "A video for beginners to learn Python. The following topics are covered: variables, data types, functions, classes, and more."
+        "title": "TITLE OF THE VIDEO",
+        "description": "A video about something. Concept1 and concept2 are explained. Concept3 is also explained a bit."
     },
     {
-        "title": "DRAMA: MrBeast did WHAT?!",
-        "description": "MrBeast did something crazy. You won't believe what he did. Watch the video to find out."
+        "title": "TITLE OF THE VIDEO",
+        "description": "A video about something. Concept1 and concept2 are explained. Concept3 is also explained a bit."
     }
 ]
 ```
