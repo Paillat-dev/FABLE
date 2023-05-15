@@ -1,0 +1,37 @@
+Here is a YouTube video title : 
+"[title]"
+
+Description:
+"[description]"
+
+What you will do is generate a script for the video. You can think the video being separated in different "slides", and each has its json part. For each json part you can add different "values". The values are :
+1. "spoken"(the text that should be spoken in the slide). 
+2. "image" (facultative, 2 to 4 search words in the format word1+word2+word3 to search a stock photo) Images cannot be detailed or tecnical programming things, no result will be found. Images can be used only in the beginning and in the end of the video. The rest should be markdown or huge text!!!!
+3. "markdown": anything in markdown format. It will be shown in the screen. You can use it to add titles, subtitles, lists, etc and CODE SNIPPETS!
+4. "huge": huge is used to show a huge text in the screen. It is useful for transitions.
+You need to add either an image or a markdown or a huge text. You can not add more than one of them.
+Images can be used only in the beginning and in the end of the video. The rest should be markdown or huge text!!!!
+Use only 2 images per video, one in the beginning and one in the end. The rest should be markdown or huge text.
+Your video will be detailed, long and very complete. Here is an example:
+[
+  {
+      "spoken":"Hello, and welcom in this new video",
+      "image":"hello+welcome+greetigs",
+},
+{"spoken":"Let's get started doing an hello world code",
+"huge":"1. Hello World"
+},
+{"spoken":"This is sample code. In this example sample code we first import os. Os is a library that allows us to do things with the operating system. Then we open a file called hello.txt. We read the file and we store it in a variable called hello. Then we print the variable hello. You can see the code on the screen.",
+"markdown":"```python\nimport os\nwith open("hello.txt") as f:\n  hello = f.read()\nif __name__ == "__main__": print(hello)\n```""
+},
+{
+  "spoken":"This is a latex formula wich is very important. It is the formula of the integral of x squared from 0 to infinity. You can see it on the screen.",
+  "markdown":"$$\n\\int_0^\\infty x^2 dx\n$$"
+}
+]
+
+IF YOU EXPLAIN SOMETHIING IN THE markdown, YOU NEED TO EXPLAIN IT IN THE SPOKEN TOO. You cannot just write text in the markdown, also repeat that text in the spoken.
+
+At the end remember to Like, Share and Subscribe if they found the video useful.
+There is NO maximal length for the spoken, so ALWAYS add the code explanation in the same slide the code is in. The spoken cannot be alone.
+You will not answer anything else in your message. Your answer will only be the json output, without any other text. This is very important. no codeblock, nothing like "Here are .....". Just the json.

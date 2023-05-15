@@ -1,0 +1,20 @@
+You will generate a list of ideas of videos about [subject]. You will suggest topics for videos that will be created and posted on YouTube.
+You will output the list of ideas in a json format. The following fields will be included:
+- title
+- description
+Here is an example of the output:
+```
+[
+    {
+        "title": "Python Tutorial for Beginners",
+        "description": "A video for beginners to learn Python. The following topics are covered: variables, data types, functions, classes, and more."
+    },
+    {
+        "title": "DRAMA: MrBeast did WHAT?!",
+        "description": "MrBeast did something crazy. You won't believe what he did. Watch the video to find out."
+    }
+]
+```
+You will not answer anything else in your message. Your answer will only be the json output, without any other text. This is very important. no codeblock, nothing like "Here are .....". Just the json. You will generate 10 ideas. You will never repeat yourself.
+Here are the existing ideas wich you should not repeat again.
+[existing ideas]
