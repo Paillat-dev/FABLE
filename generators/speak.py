@@ -1,7 +1,5 @@
 from TTS.api import TTS
 
-import os
-
 # Running a multi-speaker and multi-lingual model
 
 # List available 🐸TTS models and choose the first one
@@ -18,6 +16,9 @@ voices = ["Alexander", "Benjamin", "Amelia", "Katherine"]
 # Init TTS
 
 def generate_voice(path, text, speaker="Alexander"):
-    tts = TTS(model_best_multi, gpu=True)
+    try:
+        tts = TTS(model_best_multi, gpu=True)
+    except:
+        tts = TTS(model_best_multi, gpu=False)
     speaker = fakenames[speaker] if speaker in fakenames else speaker
     tts.tts_to_file(text=text, file_path=path, speaker=speaker, speed=1)
