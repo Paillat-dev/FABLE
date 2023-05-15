@@ -48,16 +48,18 @@ async def main():
             f.close()
     script = prepare(path)
     credits = mount(path, script)
+    description = f"{idea['description']}\n\nMusic credits: {credits}"
     with open(path + "/meta.txt", 'w', encoding='utf-8') as f:
-        f.write(f"Title: {idea['title']}\nDescription: {idea['description']}\nMusic credits: {credits}")
+        f.write(description)
         f.close()
     with open(path + "/meta_FR.txt", 'w', encoding='utf-8') as f:
         transtitle = translate('FR', idea['title']) #use the non formatted title
         transdesc = translate('FR', idea['description'])
-        f.write(f"Titre: {transtitle}\nDescription: {transdesc}\nCrédits musicaux: {credits}")
+        final = f"Titre: {transtitle}\nDescription: {transdesc}\nCrédits musicaux: {credits}"
+        f.write(final)
         f.close()
     generate_miniature(path, title=idea['title'], description=idea['description'])
-    upload_video(path, idea['title'], idea['description'], 28, "", "private", subjectdirpath)
+    upload_video(path, idea['title'], description, 28, "", "private", subjectdirpath)
     print(f"Your video is ready! You can find it in {path}.")
 
 if __name__ == "__main__":
