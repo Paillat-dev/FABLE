@@ -5,7 +5,7 @@ import logging
 
 from generators.ideas import generate_ideas
 from generators.script import generate_script
-from generators.montage import mount, prepare, translate
+from generators.montage import mount, prepare
 from generators.miniature import generate_miniature
 from generators.uploader import upload_video
 
@@ -55,12 +55,6 @@ async def main():
     description = f"{idea['description']}\n\nMusic credits: {credits}"
     with open(path + "/meta.txt", 'w', encoding='utf-8') as f:
         f.write(description)
-        f.close()
-    with open(path + "/meta_FR.txt", 'w', encoding='utf-8') as f:
-        transtitle = translate('FR', idea['title']) #use the non formatted title
-        transdesc = translate('FR', idea['description'])
-        final = f"Titre: {transtitle}\nDescription: {transdesc}\nCrédits musicaux: {credits}"
-        f.write(final)
         f.close()
     generate_miniature(path, title=idea['title'], description=idea['description'])
     upload_video(path, idea['title'], description, 28, "", "private", subjectdirpath)

@@ -78,15 +78,10 @@ def subs(length, total, text, srt, index):
     srt.append(sub)
     return srt
 
-def translate(target, text):
-    translation = translator.translate_text(text, target_lang=target).text
-    return translation
-
 def mount(path, script):
     num_slides = len(os.listdir(path + "/audio"))
     clips = []
     srt = pysrt.SubRipFile()
-    srt_fr = pysrt.SubRipFile()
     total_length = 0
     for i in range(num_slides):
         audio = AudioFileClip(path + "/audio/audio" + str(i) + ".mp3")
@@ -98,7 +93,6 @@ def mount(path, script):
         length = complete_audio.duration
         total_length += length
         srt = subs(length, total_length, script[i]['spoken'], srt, i)
-        srt_fr = subs(length, total_length, translate("FR", script[i]['spoken']), srt_fr, i)
         slide = ImageClip(path + "/slides/slide" + str(i) + ".png").set_duration(length)
         slide = slide.set_audio(complete_audio)
         clips.append(slide)
@@ -114,14 +108,12 @@ def mount(path, script):
         for i in range(int(total_length / music.duration)):
             musics.append(music)
         music = concatenate_audioclips(musics)
-    
     final_clip = concatenate_videoclips(clips, method="compose")
     existing_audio = final_clip.audio
     final_audio = CompositeAudioClip([existing_audio, music])
     final_clip = final_clip.set_audio(final_audio)
     final_clip.write_videofile(path + "/montage.mp4", fps=60, codec="nvenc")
     srt.save(path + "/montage.srt")
-    srt_fr.save(path + "/montage_fr.srt")
     with open (randpath.split(".")[0] + ".txt", 'r', encoding='utf-8') as f:
         music_credit = f.read()
         f.close()
