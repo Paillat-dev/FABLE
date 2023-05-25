@@ -53,9 +53,10 @@ async def main():
     script = prepare(path)
     credits = mount(path, script)
     description = f"{idea['description']}\n\nMusic credits: {credits}"
-    with open(path + "/meta.txt", 'w', encoding='utf-8') as f:
-        f.write(description)
-        f.close()
+    if credits != None:
+        with open(path + "/meta.txt", 'w', encoding='utf-8') as f:
+            f.write(description)
+            f.close()
     generate_miniature(path, title=idea['title'], description=idea['description'])
     upload_video(path, idea['title'], description, 28, "", "private", subjectdirpath)
     print(f"Your video is ready! You can find it in {path}.")

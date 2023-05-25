@@ -9,12 +9,12 @@ from generators.speak import generate_voice, voices
 from moviepy.video.VideoClip import ImageClip
 from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeAudioClip, concatenate_audioclips
 from moviepy.audio.io.AudioFileClip import AudioFileClip
-from moviepy.audio.fx.all import volumex, audio_fadein, audio_fadeout
+from moviepy.audio.fx.all import volumex, audio_fadein, audio_fadeout # type: ignore
 from dotenv import load_dotenv
 load_dotenv()
-unsplash_access = os.getenv("UNSPLASH_ACCESS_KEY")
+unsplash_access = os.getenv("UNSPLASH_ACCESS_KEY") or "UNSPLASH_ACCESS_KEY"
 unsplash_url = "https://api.unsplash.com/photos/random/?client_id=" + unsplash_access + "&query="
-deepl_access = os.getenv("DEEPL_ACCESS_KEY")
+deepl_access = os.getenv("DEEPL_ACCESS_KEY") or "DEEPL_ACCESS_KEY"
 translator = deepl.Translator(deepl_access)
 
 def prepare(path):
@@ -36,6 +36,9 @@ def prepare(path):
             if not os.path.exists(audio_path):
                 generate_voice(audio_path, script[i]['spoken'], choosen_voice)
             if "image" in script[i]:
+                if os.path.exists(path + "/slides/assets/slide" + str(i) + ".md"):
+                    #skip this slide
+                    continue
                 if not os.path.exists(path + "/slides/assets"):
                     os.mkdir(path + "/slides/assets")
                 url= unsplash_url + script[i]['image']
@@ -48,16 +51,29 @@ def prepare(path):
                 with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                     f.write(content)
             elif "markdown" in script[i]:
+                if os.path.exists(path + "/slides/slide" + str(i) + ".md"):
+                    #skip this slide
+                    continue
                 with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                     f.write(marp + "\n\n" + script[i]['markdown'])
             elif "huge" in script[i]:
                 #use fit
+                if os.path.exists(path + "/slides/slide" + str(i) + ".md"):
+                    #skip this slide
+                    continue
                 with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                     f.write(marp + "\n\n# <!-- fit --> " + script[i]['huge'])
             else:
-                pass
+                if os.path.exists(path + "/slides/slide" + str(i) + ".md"):
+                    #skip this slide
+                    continue
+                with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
+                    f.write(marp + "\n\n") # blank slide
     for i in range(len(script)):
         marrkdown_path = "./" + path + "/slides/slide" + str(i) + ".md"
+        if os.path.exists(f"./{path}/slides/slide{i}.png"):
+            #skip this slide
+            continue
         command = f"marp.exe {marrkdown_path} -o {path}/slides/slide{i}.png --allow-local-files"
         os.system(command)
     return script
@@ -79,42 +95,45 @@ def subs(length, total, text, srt, index):
     return srt
 
 def mount(path, script):
-    num_slides = len(os.listdir(path + "/audio"))
-    clips = []
-    srt = pysrt.SubRipFile()
-    total_length = 0
-    for i in range(num_slides):
-        audio = AudioFileClip(path + "/audio/audio" + str(i) + ".mp3")
-        complete_audio = CompositeAudioClip([
-            AudioFileClip("silence.mp3").set_duration(1),
-            audio,
-            AudioFileClip("silence.mp3").set_duration(1)
-        ])
-        length = complete_audio.duration
-        total_length += length
-        srt = subs(length, total_length, script[i]['spoken'], srt, i)
-        slide = ImageClip(path + "/slides/slide" + str(i) + ".png").set_duration(length)
-        slide = slide.set_audio(complete_audio)
-        clips.append(slide)
-    randmusic = random.choice(os.listdir("musics"))
-    while randmusic.endswith(".txt"): randmusic = random.choice(os.listdir("musics"))
-    randpath = "musics/" + randmusic
-    music = AudioFileClip(randpath).set_duration(total_length)
-    music = audio_fadein(music, 20)
-    music = audio_fadeout(music, 20)
-    music = volumex(music, 0.2)
-    musics = []
-    if music.duration < total_length:
-        for i in range(int(total_length / music.duration)):
-            musics.append(music)
-        music = concatenate_audioclips(musics)
-    final_clip = concatenate_videoclips(clips, method="compose")
-    existing_audio = final_clip.audio
-    final_audio = CompositeAudioClip([existing_audio, music])
-    final_clip = final_clip.set_audio(final_audio)
-    final_clip.write_videofile(path + "/montage.mp4", fps=60, codec="nvenc")
-    srt.save(path + "/montage.srt")
-    with open (randpath.split(".")[0] + ".txt", 'r', encoding='utf-8') as f:
-        music_credit = f.read()
-        f.close()
-    return music_credit
+    if not os.path.exists(path + "/montage.mp4"):
+        num_slides = len(os.listdir(path + "/audio"))
+        clips = []
+        srt = pysrt.SubRipFile()
+        total_length = 0
+        for i in range(num_slides):
+            audio = AudioFileClip(path + "/audio/audio" + str(i) + ".mp3")
+            complete_audio = CompositeAudioClip([
+                AudioFileClip("silence.mp3").set_duration(1),
+                audio,
+                AudioFileClip("silence.mp3").set_duration(1)
+            ])
+            length = complete_audio.duration
+            total_length += length
+            srt = subs(length, total_length, script[i]['spoken'], srt, i)
+            slide = ImageClip(path + "/slides/slide" + str(i) + ".png").set_duration(length)
+            slide = slide.set_audio(complete_audio)
+            clips.append(slide)
+        randmusic = random.choice(os.listdir("musics"))
+        while randmusic.endswith(".txt"): randmusic = random.choice(os.listdir("musics"))
+        randpath = "musics/" + randmusic
+        music = AudioFileClip(randpath).set_duration(total_length)
+        music = audio_fadein(music, 20)
+        music = audio_fadeout(music, 20)
+        music = volumex(music, 0.2)
+        musics = []
+        if music.duration < total_length:
+            for i in range(int(total_length / music.duration)):
+                musics.append(music)
+            music = concatenate_audioclips(musics)
+        final_clip = concatenate_videoclips(clips, method="compose")
+        existing_audio = final_clip.audio
+        final_audio = CompositeAudioClip([existing_audio, music])
+        final_clip = final_clip.set_audio(final_audio)
+        final_clip.write_videofile(path + "/montage.mp4", fps=60, codec="nvenc")
+        srt.save(path + "/montage.srt")
+        with open (randpath.split(".")[0] + ".txt", 'r', encoding='utf-8') as f:
+            music_credit = f.read()
+            f.close()
+        return music_credit
+    else:
+        return None

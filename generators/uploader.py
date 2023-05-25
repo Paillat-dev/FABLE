@@ -26,7 +26,7 @@ RETRIABLE_EXCEPTIONS = (httplib2.HttpLib2Error, IOError, client.NotConnected,
 
 RETRIABLE_STATUS_CODES = [500, 502, 503, 504]
 
-CLIENT_SECRETS_FILE = 'env/client_secret.json'
+CLIENT_SECRETS_FILE = ''
 
 #SCOPES = ['https://www.googleapis.com/auth/youtube.upload', 'https://www.googleapis.com/upload/youtube/v3/thumbnails/set', 'https://www.googleapis.com/auth/youtube.force-ssl']
 SCOPES = ['https://www.googleapis.com/auth/youtube']
@@ -38,6 +38,7 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 
 # Authorize the request and store authorization credentials.
 def get_authenticated_service(credentialsPath=""):
+    CLIENT_SECRETS_FILE=f'{credentialsPath}/client_secret.json'
     if os.path.exists(f'{credentialsPath}/credentials.json'):
         with open(f'{credentialsPath}/credentials.json') as json_file:
             data = json.load(json_file)
@@ -52,7 +53,7 @@ def get_authenticated_service(credentialsPath=""):
     else:
         flow = InstalledAppFlow.from_client_secrets_file(
             CLIENT_SECRETS_FILE, SCOPES)
-        credentials = flow.run_local_server()
+        credentials = flow.run_local_server(success_message="Heyy, yippie, you're authenticated ! You can close this window now !", authorization_prompt_message="Please authorize this app to upload videos on your YouTube account !")
         with open(f'{credentialsPath}/credentials.json', 'w') as outfile:
             outfile.write(credentials.to_json())
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)

@@ -20,7 +20,10 @@ async def generate_ideas(path, subject):
     except:
         ides_json = []
         ideas = "There are no existing ideas."
-    prmpt = prmpt.replace('[existing ideas]', ideas)
+    exuisting_ideas = ""
+    for idea in ides_json:
+        exuisting_ideas += f"{idea['title']}\n"
+    prmpt = prmpt.replace('[existing ideas]', exuisting_ideas)
     print(prmpt)
     response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
