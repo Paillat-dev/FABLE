@@ -26,15 +26,29 @@ async def main():
         input("It looks like it is the first time you are generating ideas for this subject. The requiered folder has been created. Press enter to continue.")
         input("Please put all the requiered google credentials files in that folder. Press enter to continue.")
         input("Please put a file called bcg.png in that folder. It will be used as the background of the thumbnails. Press enter to continue.")
-    if input("Do you want to generate new ideas? (y/n)") == "y":
+    if input("Do you want to generate new ideas? (y/N): ") == "y":
         await generate_ideas(subjectdirpath, subject)
     with open(subjectdirpath + '/ideas.json', 'r', encoding='utf-8') as f:
         ideas = json.load(f)
         f.close()
-    for i in range(len(ideas)):
-        print(str(i) + ". " + ideas[i]['title'])
+    existing = []
+    new = []
+    for i in ideas:
+        if os.path.exists(subjectdirpath + "/" + i['title'][:25].replace(" ", "_").replace(":", "") + "/script.json"):
+            existing.append(i)
+        else:
+            new.append(i)
+    print("Existing ideas:")
+    for i in range(len(existing)):
+        print(str(i) + ". " + existing[i]['title'])
+    print("New ideas:")
+    for i in range(len(new)):
+        print(str(i + len(existing)) + ". " + new[i]['title'])
     idea = int(input("Which idea do you want to generate a script for? (enter the number): "))
-    idea = ideas[idea]
+    if idea < len(existing):
+        idea = existing[idea]
+    else:
+        idea = new[idea - len(existing)]
     title = idea['title']
     title = title[:25]
     i = 0
