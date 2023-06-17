@@ -1,3 +1,10 @@
+'''
+This file's purpose is to count the number of tokens used by a list of messages.
+It is used to check if the token limit of the model is reached.
+
+Reference: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb
+'''
+
 import tiktoken
 
 async def num_tokens_from_messages(messages, model="gpt-3.5-turbo"):
