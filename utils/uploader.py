@@ -98,7 +98,7 @@ async def initialize_upload(youtube, options):
         media_body=MediaFileUpload(options['file'], chunksize=-1, resumable=True)
     )
 
-    videoid = resumable_upload(insert_request)
+    videoid = await resumable_upload(insert_request)
     return videoid
 
 
