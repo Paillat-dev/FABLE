@@ -64,12 +64,12 @@ async def main():
     video = await channel.generate_video(idea)
     printm("Done!")
     printm("Here is the video:")
-    printm(video)
+    printm(video.url)
     input("Press enter to continue...")
 if __name__ == "__main__":
     while True:
-        asyncio.run(main())
         try:
+            asyncio.run(main())
             input("Press enter to continue or type ctrl+c to quit : ")
             clear_screen()
         except KeyboardInterrupt:

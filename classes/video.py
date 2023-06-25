@@ -31,7 +31,7 @@ class Video:
             os.makedirs( self.path)
         script = None
         if os.path.exists(os.path.join( self.path, "script.json")):
-            if input("Video script already exists. Do you want to overwrite it ? (y/N) : ") == "y":
+            if input("Video script already exists. Do you want to overwrite it ? (y/N) : ").lower() == "y":
                 os.remove(os.path.join( self.path, "script.json"))
     
         if not os.path.exists(os.path.join( self.path, "script.json")):
@@ -41,14 +41,17 @@ class Video:
                     script_prompt = f.read()
                     f.close()
             if script_prompt:
+                printm("Using custom script prompt")
                 script = await generate_script(self.idea['title'], self.idea['description'], script_prompt)
             else:
+                printm("Using default script prompt")
                 script = await generate_script(self.idea['title'], self.idea['description'])
+            script = json.loads(script)
             with open(os.path.join( self.path, "script.json"), "w") as f:
-                json.dump(json.loads(script), f)
+                json.dump(script, f)
                 f.close()
         else:
-            with open(os.path.join( self.path, "script.json"), "r") as f:
+            with open(os.path.join(self.path, "script.json"), "r") as f:
                 script = json.load(f)
                 f.close()
         await prepare( self.path)

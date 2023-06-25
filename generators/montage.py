@@ -4,7 +4,7 @@ import requests
 import pysrt
 import random
 
-from generators.speak import generate_voice, voices
+from generators.speak import VoiceGenerator, voices
 from moviepy.video.VideoClip import ImageClip
 from moviepy.editor import concatenate_videoclips, CompositeAudioClip, concatenate_audioclips
 from moviepy.audio.io.AudioFileClip import AudioFileClip
@@ -31,10 +31,11 @@ async def prepare(path):
         f.close() 
     if fresh:
         choosen_voice = random.choice(voices)
+        generator = VoiceGenerator(speaker=choosen_voice)
         for i in range(len(script)):
-            audio_path = path + "/audio/audio" + str(i) + ".mp3"
+            audio_path = path + "/audio/audio" + str(i) + ".wav"
             if not os.path.exists(audio_path):
-                generate_voice(audio_path, script[i]['spoken'], choosen_voice)
+                generator.generate_voice(audio_path, script[i]['spoken'])
             if "image" in script[i]:
                 if os.path.exists(path + "/slides/assets/slide" + str(i) + ".md"):
                     #skip this slide
@@ -70,11 +71,14 @@ async def prepare(path):
                 with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                     f.write(marp + "\n\n") # blank slide
     for i in range(len(script)):
-        marrkdown_path = os.path.join(path, f"slides/slide{i}.md")
-        if os.path.exists(f"./{path}/slides/slide{i}.png"):
+        markdown_path = os.path.join(path, f"slides/slide{i}.md")
+        markdown_path = os.path.abspath(markdown_path)
+        image_path = os.path.join(path, f"slides/slide{i}.png")
+        image_path = os.path.abspath(image_path)
+        if os.path.exists(markdown_path):
             #skip this slide
             continue
-        command = f"marp.exe {marrkdown_path} -o {path}/slides/slide{i}.png --allow-local-files"
+        command = f'marp.exe "{markdown_path}" -o "{image_path}" --allow-local-files'
         os.system(command)
     return script
 
@@ -101,7 +105,7 @@ async def mount(path, script):
         srt = pysrt.SubRipFile()
         total_length = 0
         for i in range(num_slides):
-            audio = AudioFileClip(path + "/audio/audio" + str(i) + ".mp3")
+            audio = AudioFileClip(path + "/audio/audio" + str(i) + ".wav")
             complete_audio = CompositeAudioClip([
                 AudioFileClip("silence.mp3").set_duration(1),
                 audio,
@@ -109,6 +113,8 @@ async def mount(path, script):
             ])
             length = complete_audio.duration
             total_length += length
+            print(script[i])
+            print(script[i]['spoken'])
             srt = subs(length, total_length, script[i]['spoken'], srt, i)
             slide = ImageClip(path + "/slides/slide" + str(i) + ".png").set_duration(length)
             slide = slide.set_audio(complete_audio)
