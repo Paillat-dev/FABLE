@@ -31,8 +31,7 @@ class Video:
             os.makedirs( self.path)
         script = None
         if os.path.exists(os.path.join( self.path, "script.json")):
-            printm("Video script already exists. Do you want to overwrite it ?")
-            if input("y/N") == "y":
+            if input("Video script already exists. Do you want to overwrite it ? (y/N) : ") == "y":
                 os.remove(os.path.join( self.path, "script.json"))
     
         if not os.path.exists(os.path.join( self.path, "script.json")):
@@ -51,7 +50,7 @@ class Video:
             "description": self.idea['description'] + "\n\n" + credits,
         }
         await generate_thumbnail( self.path, self.idea['title'], self.idea['description'])
-        videoid = await upload_video( self.path, self.idea['title'], self.metadata['description'], 28, "", "private", self.path)
+        videoid = await upload_video( self.path, self.idea['title'], self.metadata['description'], 28, "", "private", self.parent.path)
         printm(f"Your video is ready! You can find it in { self.path}")
         video_meta_file = {
             "title": self.idea['title'],

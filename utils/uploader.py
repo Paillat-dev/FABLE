@@ -39,7 +39,19 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 
 # Authorize the request and store authorization credentials.
 async def get_authenticated_service(credentialsPath=""):
-    CLIENT_SECRETS_FILE=f'{credentialsPath}/client_secret.json'
+    CLIENT_SECRETS_FILE = ""
+    try:
+        CLIENT_SECRETS_FILE=os.path.join(credentialsPath, "client_secret.json")
+    except:
+        listdir = os.listdir(credentialsPath)
+        for file in listdir:
+            if file.startswith("client_secret"):
+                #rename file to client_secret.json
+                os.rename(os.path.join(credentialsPath, file), os.path.join(credentialsPath, "client_secret.json"))
+                CLIENT_SECRETS_FILE=os.path.join(credentialsPath, "client_secret.json")
+                break
+    if CLIENT_SECRETS_FILE == "":
+        raise FileNotFoundError("No client_secret.json file found in the specified path !")
     if os.path.exists(f'{credentialsPath}/credentials.json'):
         with open(f'{credentialsPath}/credentials.json') as json_file:
             data = json.load(json_file)
@@ -143,7 +155,7 @@ async def upload_video(path, title, description, category, keywords, privacyStat
         print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
 
 async def upload_thumbnail(video_id, file, credentials_path=""):
-    youtube = get_authenticated_service(credentials_path)
+    youtube = await get_authenticated_service(credentials_path)
     youtube.thumbnails().set( # type: ignore
         videoId=video_id,
         media_body=file

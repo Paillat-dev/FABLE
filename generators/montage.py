@@ -18,7 +18,7 @@ if not unsplash_access:
 unsplash_url = "https://api.unsplash.com/photos/random/?client_id=" + unsplash_access + "&query="
 
 async def prepare(path):
-    with open(path + "/script.json", 'r', encoding='utf-8') as f:
+    with open(os.path.join(path, "script.json"), 'r', encoding='utf-8') as f:
         script = json.load(f)
         f.close()
     if not os.path.exists(path + "/slides"): os.mkdir(path + "/slides")
@@ -70,7 +70,7 @@ async def prepare(path):
                 with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                     f.write(marp + "\n\n") # blank slide
     for i in range(len(script)):
-        marrkdown_path = "./" + path + "/slides/slide" + str(i) + ".md"
+        marrkdown_path = os.path.join(path, f"slides/slide{i}.md")
         if os.path.exists(f"./{path}/slides/slide{i}.png"):
             #skip this slide
             continue
@@ -134,6 +134,6 @@ async def mount(path, script):
         with open (randpath.split(".")[0] + ".txt", 'r', encoding='utf-8') as f:
             music_credit = f.read()
             f.close()
-        return music_credit
+        return music_credit or ""
     else:
         return None

@@ -5,6 +5,7 @@ from PIL import Image
 from PIL import Image, ImageDraw, ImageFont
 
 from utils.openaicaller import openai
+from utils.misc import open_explorer_here
 '''
 Putpose of this file is to generate a miniature of the video.
 It has a function that takes a path, title, and description and generates a miniature.
@@ -47,7 +48,7 @@ async def rand_gradient(image):
 
 async def generate_thumbnail(path, title, description):
     prmpt = prompt.replace("[TITLE]", title).replace("[DESCRIPTION]", description)
-    response = openai.generate_response(
+    response = await openai.generate_response(
         model="gpt-4",
         messages=[
             {"role":"user","content":prmpt},
@@ -58,14 +59,18 @@ async def generate_thumbnail(path, title, description):
     await generate_image(path, text1, text2)
 
 async def generate_image(path, text1, text2):
-    path_to_bcg = path.split("/")[:-1]
-    path_to_bcg = "/".join(path_to_bcg)
+#    path_to_bcg = path.split("/")[:-1]
+#    path_to_bcg = "/".join(path_to_bcg)
+    #use os instead
+    path_to_bcg = os.path.dirname(os.path.dirname(path))
     print(path_to_bcg)
     if not os.path.exists(f"{path_to_bcg}/bcg.png"):
-        input("bcg.png not found. Please put bcg.png in the same folder as the video."+path_to_bcg)
+        input("bcg.png not found. Please put bcg.png in the folder that will open. Press enter to open the folder.")
+        open_explorer_here(path_to_bcg)
+        input("Press enter when you have put bcg.png in the folder.")
         if not os.path.exists(f"{path_to_bcg}/bcg.png"):
             input("bcg.png still not found. Exiting.")
-            exit()
+            raise FileNotFoundError("bcg.png not found")
     bcg = Image.open(f"{path_to_bcg}/bcg.png")
     img = Image.new('RGBA', (1920, 1080))
     img, textcolor1, textcolor2 = await rand_gradient(img)
