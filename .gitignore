@@ -119,6 +119,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env.yaml
 
 # Spyder project settings
 .spyderproject
@@ -160,3 +161,4 @@ test/
 ideas/
 montageTEMP_MPY_wvf_snd.mp3
 marp.exe
+channels/

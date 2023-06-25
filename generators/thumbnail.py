@@ -1,13 +1,10 @@
-import openai
+import random
 import os
 
-from PIL import Image, ImageDraw, ImageFont
-import random
-from dotenv import load_dotenv
 from PIL import Image
-load_dotenv()
+from PIL import Image, ImageDraw, ImageFont
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+from utils.openaicaller import openai
 '''
 Putpose of this file is to generate a miniature of the video.
 It has a function that takes a path, title, and description and generates a miniature.
@@ -30,11 +27,12 @@ Answer without anything else, just with the 2 textes. Answer with text1 on the f
 Here is the title of the video: [TITLE]
 Here is the description of the video: [DESCRIPTION]'''
 
-def rand_gradient(image):
+async def rand_gradient(image):
     randr = random.SystemRandom().randint(1, 20)
     randg = random.SystemRandom().randint(1, 20)
     randb = random.SystemRandom().randint(1, 20)
-
+    textcolor1 = [0, 0, 0]
+    textcolor2 = [0, 0, 0]
     for i in range(image.size[0]):
         for j in range(image.size[1]):
             colors = [i//randr, j//randg, i//randb]
@@ -47,20 +45,19 @@ def rand_gradient(image):
             image.putpixel((i,j), (colors[0], colors[1], colors[2]))
     return image, textcolor1, textcolor2
 
-def generate_miniature(path, title, description):
+async def generate_thumbnail(path, title, description):
     prmpt = prompt.replace("[TITLE]", title).replace("[DESCRIPTION]", description)
-    response = openai.ChatCompletion.create(
+    response = openai.generate_response(
         model="gpt-4",
         messages=[
             {"role":"user","content":prmpt},
         ],
         )
-    response['choices'][0]['message']['content']
-    text1 = response['choices'][0]['message']['content'].split("\n")[0]
-    text2 = response['choices'][0]['message']['content'].split("\n")[1]
-    generate_image(path, text1, text2)
+    text1 = response['choices'][0]['message']['content'].split("\n")[0] # type: ignore
+    text2 = response['choices'][0]['message']['content'].split("\n")[1] # type: ignore
+    await generate_image(path, text1, text2)
 
-def generate_image(path, text1, text2):
+async def generate_image(path, text1, text2):
     path_to_bcg = path.split("/")[:-1]
     path_to_bcg = "/".join(path_to_bcg)
     print(path_to_bcg)
@@ -71,7 +68,7 @@ def generate_image(path, text1, text2):
             exit()
     bcg = Image.open(f"{path_to_bcg}/bcg.png")
     img = Image.new('RGBA', (1920, 1080))
-    img, textcolor1, textcolor2 = rand_gradient(img)
+    img, textcolor1, textcolor2 = await rand_gradient(img)
     draw = ImageDraw.Draw(img)
     font1 = ImageFont.truetype("./Sigmar-Regular.ttf", 200)
     font2 = ImageFont.truetype("./Sigmar-Regular.ttf", 200)

@@ -1,20 +1,20 @@
 import os
-import openai
-from dotenv import load_dotenv
-load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+from utils.openaicaller import openai
+
+with open('prompts/script.txt') as f:
+    global_prompt = f.read()
+    f.close()
 
 async def generate_script(title, description):
-    with open('prompts/script.txt') as f:
-        prompt = f.read()
-        f.close()
+    prompt = global_prompt
     prompt = prompt.replace("[title]", title)
     prompt = prompt.replace("[description]", description)
-    response = await openai.ChatCompletion.acreate(
+    '''response = await openai.ChatCompletion.acreate(
         model="gpt-4",
         messages=[
             {"role":"user","content":prompt}
         ],
-        )
-    return response['choices'][0]['message']['content']
+        )''' # Deprecated. Use openaicaller.py instead
+    response = await openai.generate_response(model="gpt-4", messages=[{'role':'user', 'content': prompt}])
+    return response['choices'][0]['message']['content'] # type: ignore

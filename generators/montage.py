@@ -2,22 +2,22 @@ import json
 import os
 import requests
 import pysrt
-import deepl
 import random
 
 from generators.speak import generate_voice, voices
 from moviepy.video.VideoClip import ImageClip
-from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeAudioClip, concatenate_audioclips
+from moviepy.editor import concatenate_videoclips, CompositeAudioClip, concatenate_audioclips
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.audio.fx.all import volumex, audio_fadein, audio_fadeout # type: ignore
-from dotenv import load_dotenv
-load_dotenv()
-unsplash_access = os.getenv("UNSPLASH_ACCESS_KEY") or "UNSPLASH_ACCESS_KEY"
-unsplash_url = "https://api.unsplash.com/photos/random/?client_id=" + unsplash_access + "&query="
-deepl_access = os.getenv("DEEPL_ACCESS_KEY") or "DEEPL_ACCESS_KEY"
-translator = deepl.Translator(deepl_access)
+from utils.misc import getenv
 
-def prepare(path):
+
+unsplash_access = getenv("unsplash_access_key")
+if not unsplash_access:
+    raise Exception("UNSPLASH_ACCESS_KEY is not set in .env file")
+unsplash_url = "https://api.unsplash.com/photos/random/?client_id=" + unsplash_access + "&query="
+
+async def prepare(path):
     with open(path + "/script.json", 'r', encoding='utf-8') as f:
         script = json.load(f)
         f.close()
@@ -94,7 +94,7 @@ def subs(length, total, text, srt, index):
     srt.append(sub)
     return srt
 
-def mount(path, script):
+async def mount(path, script):
     if not os.path.exists(path + "/montage.mp4"):
         num_slides = len(os.listdir(path + "/audio"))
         clips = []

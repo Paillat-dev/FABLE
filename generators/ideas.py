@@ -1,10 +1,6 @@
-import openai 
-import os
 import json
-from dotenv import load_dotenv
-load_dotenv()
+from utils.openaicaller import openai
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 with open('prompts/ideas.txt') as f:
     prompt = f.read()
     f.close()
@@ -25,13 +21,13 @@ async def generate_ideas(path, subject):
         exuisting_ideas += f"{idea['title']}\n"
     prmpt = prmpt.replace('[existing ideas]', exuisting_ideas)
     print(prmpt)
-    response = await openai.ChatCompletion.acreate(
+    response = await openai.generate_response(
         model="gpt-3.5-turbo",
         messages=[
             {"role":"user","content":prmpt},
         ],
         )
-    json_in_str= response['choices'][0]['message']['content']
+    json_in_str= response['choices'][0]['message']['content'] # type: ignore
     json_obj = json.loads(json_in_str)
     for idea in json_obj:
         ides_json.append(idea)

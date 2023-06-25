@@ -7,6 +7,7 @@ import os
 import random
 import time
 import json
+import asyncio
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -37,7 +38,7 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 
 
 # Authorize the request and store authorization credentials.
-def get_authenticated_service(credentialsPath=""):
+async def get_authenticated_service(credentialsPath=""):
     CLIENT_SECRETS_FILE=f'{credentialsPath}/client_secret.json'
     if os.path.exists(f'{credentialsPath}/credentials.json'):
         with open(f'{credentialsPath}/credentials.json') as json_file:
@@ -59,7 +60,7 @@ def get_authenticated_service(credentialsPath=""):
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 
-def initialize_upload(youtube, options):
+async def initialize_upload(youtube, options):
     tags = None
     if options['keywords']:
         tags = options['keywords'].split(',')
@@ -89,7 +90,7 @@ def initialize_upload(youtube, options):
     return videoid
 
 
-def resumable_upload(request):
+async def resumable_upload(request):
     response = None
     error = None
     retry = 0
@@ -122,9 +123,9 @@ def resumable_upload(request):
             max_sleep = 2 ** retry
             sleep_seconds = random.random() * max_sleep
             print('Sleeping %f seconds and then retrying...' % sleep_seconds)
-            time.sleep(sleep_seconds)
+            await asyncio.sleep(sleep_seconds)
 
-def upload_video(path, title, description, category, keywords, privacyStatus='private', credentials_path=""):
+async def upload_video(path, title, description, category, keywords, privacyStatus='private', credentials_path=""):
     options = {
         'file': path +"/montage.mp4",
         'title': title,
@@ -133,16 +134,17 @@ def upload_video(path, title, description, category, keywords, privacyStatus='pr
         'keywords': keywords,
         'privacyStatus': privacyStatus
     }
-    youtube = get_authenticated_service(credentials_path)
+    youtube = await get_authenticated_service(credentials_path)
     try:
-        videoid = initialize_upload(youtube, options)
+        videoid = await initialize_upload(youtube, options)
+        await upload_thumbnail(videoid, path + "/miniature.png", credentials_path)
+        return videoid
     except HttpError as e:
         print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
-    upload_thumbnail(videoid, path + "/miniature.png", credentials_path)
 
-def upload_thumbnail(video_id, file, credentials_path=""):
+async def upload_thumbnail(video_id, file, credentials_path=""):
     youtube = get_authenticated_service(credentials_path)
-    youtube.thumbnails().set(
+    youtube.thumbnails().set( # type: ignore
         videoId=video_id,
         media_body=file
     ).execute()

@@ -1,79 +1,71 @@
 import os
-import json
 import asyncio
 import logging
+import yaml
 
-from generators.ideas import generate_ideas
-from generators.script import generate_script
-from generators.montage import mount, prepare
-from generators.miniature import generate_miniature
-from generators.uploader import upload_video
+from classes.channel import Channel
+from utils.config import loadingmessage, bcolors
+from utils.misc import clear_screen, printm, getenv
+from utils.openaicaller import openai
 
 logging.basicConfig(level=logging.INFO)
 
 async def main():
-    if not os.path.exists('videos'): os.makedirs('videos')
-    with open('env/subjects.txt', 'r', encoding='utf-8') as f:
-        subjects = f.read().splitlines()
-        f.close()
-    for i in range(len(subjects)):
-        print(str(i) + ". " + subjects[i])
-    subject = int(input("Which subject do you want to generate ideas for? (enter the number): "))
-    subject = subjects[subject]
-    subjectdirpath = "videos/" + subject[:25].replace(" ", "_").replace(":", "")
-    if not os.path.exists(subjectdirpath): 
-        os.makedirs(subjectdirpath)
-        input("It looks like it is the first time you are generating ideas for this subject. The requiered folder has been created. Press enter to continue.")
-        input("Please put all the requiered google credentials files in that folder. Press enter to continue.")
-        input("Please put a file called bcg.png in that folder. It will be used as the background of the thumbnails. Press enter to continue.")
-    if input("Do you want to generate new ideas? (y/N): ") == "y":
-        await generate_ideas(subjectdirpath, subject)
-    with open(subjectdirpath + '/ideas.json', 'r', encoding='utf-8') as f:
-        ideas = json.load(f)
-        f.close()
-    existing = []
-    new = []
-    for i in ideas:
-        if os.path.exists(subjectdirpath + "/" + i['title'][:25].replace(" ", "_").replace(":", "") + "/script.json"):
-            existing.append(i)
-        else:
-            new.append(i)
-    print("Existing ideas:")
-    for i in range(len(existing)):
-        print(str(i) + ". " + existing[i]['title'])
-    print("New ideas:")
-    for i in range(len(new)):
-        print(str(i + len(existing)) + ". " + new[i]['title'])
-    idea = int(input("Which idea do you want to generate a script for? (enter the number): "))
-    if idea < len(existing):
-        idea = existing[idea]
+    printm("Loading...")
+    await asyncio.sleep(1)
+    clear_screen()
+    printm(loadingmessage)
+    await asyncio.sleep(4)
+    clear_screen()
+    await asyncio.sleep(1)
+    printm("Welcome in FABLE, the Film and Artistic Bot for Lively Entertainment!")
+    await asyncio.sleep(1)
+    printm(f"This program will generate for you complete {bcolors.FAIL}{bcolors.BOLD}YouTube{bcolors.ENDC} videos, as well as uploading them to YouTube.")
+    if not os.path.exists('env.yaml'):
+        printm("It looks like you don't have an OpenAI API key yet. Please paste it here:")
+        openai_api_key = input("Paste the key here: ")
+        openai.set_api_key(openai_api_key)
+        printm("Please also paste your unsplash access key here:")
+        unsplash_access_key = input("Paste the key here: ")
+        env_file = {
+            "openai_api_key": openai_api_key,
+            "unsplash_access_key": unsplash_access_key
+        }
+        with open('env.yaml', 'w') as f:
+            yaml.dump(env_file, f)
+            f.close()
     else:
-        idea = new[idea - len(existing)]
-    title = idea['title']
-    title = title[:25]
-    i = 0
-    path = subjectdirpath + "/" + title
-    path = path.replace(" ", "_").replace(":", "")
-    if not os.path.exists(path + "/script.json"):
-        script = await generate_script(idea['title'], idea['description'])
-        if os.path.exists(path) and os.path.exists(path + "/script.json"):
-            if input("There is already a script for this idea. Do you want to overwrite it? (y/n)") != "y":
-                print("Exiting...")
-                exit(1)
-        if not os.path.exists(path): os.makedirs(path)
-        with open(path + "/script.json", 'w', encoding='utf-8') as f:
-            f.write(script)
-            f.close()
-    script = prepare(path)
-    credits = mount(path, script)
-    description = f"{idea['description']}\n\nMusic credits: {credits}"
-    if credits != None:
-        with open(path + "/meta.txt", 'w', encoding='utf-8') as f:
-            f.write(description)
-            f.close()
-    generate_miniature(path, title=idea['title'], description=idea['description'])
-    upload_video(path, idea['title'], description, 28, "", "private", subjectdirpath)
-    print(f"Your video is ready! You can find it in {path}.")
-
+        openai_api_key = getenv('openai_api_key')
+        openai.set_api_key(openai_api_key)
+    channels = os.listdir('channels')
+    if len(channels) == 0:
+        printm("It looks like you don't have any channels yet. Let's create one!")
+        channel = Channel()
+        await channel.create()
+    else:
+        printm("Here are your channels:")
+        for i, channel in enumerate(channels):
+            printm(f"{i+1}. {channel}")
+        printm(f"{len(channels)+1}. Create a new channel")
+        index = input("Which channel do you want to use : ")
+        if index == str(len(channels)+1):
+            channel = Channel()
+            await channel.create()
+        else:
+            channel_name = channels[int(index)-1]
+            channel = Channel()
+            await channel.load(channel_name)
+    printm("Now, let's create a video!")
+    printm("Here are all the ideas you have:")
+    for i, idea in enumerate(channel.ideas):
+        printm(f"{i+1}. {idea['title']}")
+    index = input("Which idea do you want to create a video for : ")
+    idea = channel.ideas[int(index)-1]
+    video = await channel.generate_video(idea)
+    printm("Done!")
+    printm("Here is the video:")
+    printm(video.url)
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.close()
