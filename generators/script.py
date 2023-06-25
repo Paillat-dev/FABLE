@@ -6,8 +6,7 @@ with open('prompts/script.txt') as f:
     global_prompt = f.read()
     f.close()
 
-async def generate_script(title, description):
-    prompt = global_prompt
+async def generate_script(title, description, prompt=global_prompt):
     prompt = prompt.replace("[title]", title)
     prompt = prompt.replace("[description]", description)
     '''response = await openai.ChatCompletion.acreate(

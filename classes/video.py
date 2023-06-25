@@ -35,7 +35,15 @@ class Video:
                 os.remove(os.path.join( self.path, "script.json"))
     
         if not os.path.exists(os.path.join( self.path, "script.json")):
-            script = await generate_script(self.idea['title'], self.idea['description'])
+            script_prompt = None
+            if os.path.exists(os.path.join(self.parent.path, "script_prompt.txt")):
+                with open(os.path.join(self.parent.path, "script_prompt.txt"), "r") as f:
+                    script_prompt = f.read()
+                    f.close()
+            if script_prompt:
+                script = await generate_script(self.idea['title'], self.idea['description'], script_prompt)
+            else:
+                script = await generate_script(self.idea['title'], self.idea['description'])
             with open(os.path.join( self.path, "script.json"), "w") as f:
                 json.dump(json.loads(script), f)
                 f.close()

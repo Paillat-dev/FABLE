@@ -65,7 +65,12 @@ async def main():
     printm("Done!")
     printm("Here is the video:")
     printm(video)
+    input("Press enter to continue...")
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    loop.close()
+    while True:
+        asyncio.run(main())
+        try:
+            input("Press enter to continue or type ctrl+c to quit : ")
+            clear_screen()
+        except KeyboardInterrupt:
+            break
