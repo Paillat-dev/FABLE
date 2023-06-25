@@ -38,7 +38,7 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 
 
 # Authorize the request and store authorization credentials.
-async def get_authenticated_service(credentialsPath=""):
+async def get_authenticated_service(credentialsPath="", force_refresh=False):
     CLIENT_SECRETS_FILE = ""
     try:
         CLIENT_SECRETS_FILE=os.path.join(credentialsPath, "client_secret.json")
@@ -52,7 +52,7 @@ async def get_authenticated_service(credentialsPath=""):
                 break
     if CLIENT_SECRETS_FILE == "":
         raise FileNotFoundError("No client_secret.json file found in the specified path !")
-    if os.path.exists(f'{credentialsPath}/credentials.json'):
+    if os.path.exists(f'{credentialsPath}/credentials.json') and not force_refresh:
         with open(f'{credentialsPath}/credentials.json') as json_file:
             data = json.load(json_file)
             credentials = google.oauth2.credentials.Credentials(
@@ -146,16 +146,28 @@ async def upload_video(path, title, description, category, keywords, privacyStat
         'keywords': keywords,
         'privacyStatus': privacyStatus
     }
-    youtube = await get_authenticated_service(credentials_path)
-    try:
-        videoid = await initialize_upload(youtube, options)
-        await upload_thumbnail(videoid, path + "/miniature.png", credentials_path)
-        return videoid
-    except HttpError as e:
-        print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
+    refresh = False
+    while True:
+        try:
+            youtube = await get_authenticated_service(credentials_path, force_refresh=refresh)
+            videoid = await initialize_upload(youtube, options)
+            await upload_thumbnail(videoid, path + "/miniature.png", credentials_path, youtube)
+            return videoid
+        except HttpError as e:
+            print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
+            #escape the loop
+            break
+        except:
+            #refresh the token
+            if not refresh: 
+                refresh = True
+            else:
+                #escape the loop
+                break
+            
+            
 
-async def upload_thumbnail(video_id, file, credentials_path=""):
-    youtube = await get_authenticated_service(credentials_path)
+async def upload_thumbnail(video_id, file, credentials_path="", youtube=None):
     youtube.thumbnails().set( # type: ignore
         videoId=video_id,
         media_body=file

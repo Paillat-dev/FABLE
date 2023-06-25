@@ -64,7 +64,7 @@ async def main():
     video = await channel.generate_video(idea)
     printm("Done!")
     printm("Here is the video:")
-    printm(video.url)
+    printm(video)
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

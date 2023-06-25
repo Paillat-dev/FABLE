@@ -62,4 +62,4 @@ class Video:
         with open(os.path.join( self.path, "video.yaml"), "w") as f:
             yaml.dump(video_meta_file, f)
             f.close()
-        return video_meta_file
+        return self
