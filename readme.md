@@ -2,7 +2,7 @@
 This repository contains a whole bunch of scripts and tools connected together to automate the process of generatig unlimited videos from a given subject. It handles everything from creating the script, to generating the video, to uploading it to YouTube as well as creating the thumbnail and the description.
 
 # Getting Started
-:warning: **This is not a tutorial on how to use the scripts. You will need to know how to use the command line and how to install dependencies, as well as some knowledge on how to look for other tutorials on the internet if you get stuck.**
+:warning: <strong> This is not a tutorial on how to use the scripts. You will need to know how to use the command line and how to install dependencies, <ins>as well as some knowledge on how to look for other tutorials on the internet if you get stuck.</ins></strong>
 
 If it is the first time you are using this repository, you will need to install the dependencies. To do so, run the following command:
 ```
