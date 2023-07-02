@@ -11,15 +11,15 @@ from utils.openaicaller import openai
 logging.basicConfig(level=logging.INFO)
 
 async def main():
-    printm("Loading...")
-    await asyncio.sleep(1)
-    clear_screen()
+    #printm("Loading...")
+    #await asyncio.sleep(1)
+    #clear_screen()
     printm(loadingmessage)
-    await asyncio.sleep(4)
-    clear_screen()
-    await asyncio.sleep(1)
+    #await asyncio.sleep(4)
+    #clear_screen()
+    await asyncio.sleep(0.5)
     printm("Welcome in FABLE, the Film and Artistic Bot for Lively Entertainment!")
-    await asyncio.sleep(1)
+    await asyncio.sleep(0.5)
     printm(f"This program will generate for you complete {bcolors.FAIL}{bcolors.BOLD}YouTube{bcolors.ENDC} videos, as well as uploading them to YouTube.")
     if not os.path.exists('env.yaml'):
         printm("It looks like you don't have an OpenAI API key yet. Please paste it here:")
@@ -57,9 +57,17 @@ async def main():
             await channel.load(channel_name)
     printm("Now, let's create a video!")
     printm("Here are all the ideas you have:")
+    printm("0. Generate new ideas")
     for i, idea in enumerate(channel.ideas):
         printm(f"{i+1}. {idea['title']}")
     index = input("Which idea do you want to create a video for : ")
+    if index == "0":
+        printm("Generating new ideas...")
+        await channel.generate_ideas()
+        printm("Here are your new ideas:")
+        for i, idea in enumerate(channel.ideas):
+            printm(f"{i+1}. {idea['title']}")
+        index = input("Which idea do you want to create a video for : ")
     idea = channel.ideas[int(index)-1]
     video = await channel.generate_video(idea)
     printm("Done!")

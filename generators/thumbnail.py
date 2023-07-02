@@ -28,6 +28,11 @@ Answer without anything else, just with the 2 textes. Answer with text1 on the f
 Here is the title of the video: [TITLE]
 Here is the description of the video: [DESCRIPTION]'''
 
+
+# TODO: make jpg qith 90% quality default when generating the image to avoid having to convert it later
+
+
+
 async def rand_gradient(image):
     randr = random.SystemRandom().randint(1, 20)
     randg = random.SystemRandom().randint(1, 20)
@@ -110,11 +115,20 @@ async def generate_image(path, text1, text2):
     drawtext2.text((imgtext2.size[0]//8*2.5, imgtext2.size[1]//5*2), text2def, font=font2, fill=(textcolor2[0], textcolor2[1], textcolor2[2]))
     imgtext2 = imgtext2.rotate(5, expand=True)
     #paste the textes on the image
-    img.paste(bcg, (0, 0), bcg)
+    bcg = bcg.convert('RGBA')
+    #also set the bcg size to the image size
+    bcg = bcg.resize((1920, 1080))
+    img.paste(bcg, (0, 0), bcg) # TODO: make it work with standard pngs (non rgba)
     img.paste(imgtext1, (0, 0-img.size[1]//8), imgtext1)
     if len(text1def.split("\n")) > 2: #if the text is too long, put the second text on the third line
         img.paste(imgtext2, (0, img.size[1]//8), imgtext2)
     else:
         img.paste(imgtext2, (0, 0), imgtext2)
-    img.save(path + "/miniature.png")
-    return path + "/miniature.png"
+    #disable the alpha channel
+    img = img.convert('RGB')
+    img_path = os.path.abspath(os.path.join(path, "thumbnail.jpg"))
+    for quality in range(100, 0, -1):
+        img.save(img_path, quality=quality)
+        if os.path.getsize(img_path) < 2000000:
+            break
+    return img_path

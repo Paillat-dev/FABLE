@@ -41,7 +41,10 @@ VALID_PRIVACY_STATUSES = ('public', 'private', 'unlisted')
 async def get_authenticated_service(credentialsPath="", force_refresh=False):
     CLIENT_SECRETS_FILE = ""
     try:
-        CLIENT_SECRETS_FILE=os.path.join(credentialsPath, "client_secret.json")
+        if os.path.exists(os.path.join(credentialsPath, "client_secret.json")):
+            CLIENT_SECRETS_FILE=os.path.join(credentialsPath, "client_secret.json")
+        else:
+            raise FileNotFoundError("No client_secret.json file found in the specified path !")
     except:
         listdir = os.listdir(credentialsPath)
         for file in listdir:
@@ -146,25 +149,16 @@ async def upload_video(path, title, description, category, keywords, privacyStat
         'keywords': keywords,
         'privacyStatus': privacyStatus
     }
-    refresh = False
-    while True:
-        try:
-            youtube = await get_authenticated_service(credentials_path, force_refresh=refresh)
-            videoid = await initialize_upload(youtube, options)
-            await upload_thumbnail(videoid, path + "/miniature.png", credentials_path, youtube)
-            return videoid
-        except HttpError as e:
-            print('An HTTP error %d occurred:\n%s' % (e.resp.status, e.content))
-            #escape the loop
-            break
-        except:
-            #refresh the token
-            if not refresh: 
-                refresh = True
-            else:
-                #escape the loop
-                break
-            
+    youtube = await get_authenticated_service(credentials_path, force_refresh=False)
+    print("Uploading video...")
+    try:
+        videoid = await initialize_upload(youtube, options)
+    except:
+        youtube = await get_authenticated_service(credentials_path, force_refresh=True)
+        videoid = await initialize_upload(youtube, options)
+    thumb_path = os.path.abspath(os.path.join(path, "thumbnail.jpg"))
+    await upload_thumbnail(videoid, thumb_path, credentials_path, youtube)
+    return videoid
             
 
 async def upload_thumbnail(video_id, file, credentials_path="", youtube=None):

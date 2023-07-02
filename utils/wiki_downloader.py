@@ -13,7 +13,7 @@ def download_image(query, download_path):
     driver = uc.Chrome(options=options)
 
     try:
-        driver.get(f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=990&tbs=isz:l&q=site:wikipedia.org+{query.replace(' ', '+')}")
+        driver.get(f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=99&q=site:wikipedia.org+{query.replace(' ', '+')}")
         time.sleep(2)
 
         tos = driver.find_elements(By.CLASS_NAME, "VfPpkd-vQzf8d")
@@ -21,11 +21,10 @@ def download_image(query, download_path):
             if to.text.lower() == "tout refuser":
                 to.click()
                 break
-
-        time.sleep(10)
+        time.sleep(1)
         image = driver.find_element(By.CLASS_NAME, "rg_i")
         image.click()
-        time.sleep(2)
+        time.sleep(5)
         image = driver.find_element(By.CLASS_NAME, "r48jcc").get_attribute("src") or ""
         
         image_content = None
