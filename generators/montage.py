@@ -15,7 +15,7 @@ from utils.wiki_downloader import download_image as wiki_download_image
 unsplash_access = getenv("unsplash_access_key")
 if not unsplash_access:
     raise Exception("UNSPLASH_ACCESS_KEY is not set in .env file")
-unsplash_url = "https://api.unsplash.com/photos/random/?client_id=" + unsplash_access + "&query="
+unsplash_url = "https://source.unsplash.com/random/?"
 
 async def prepare(path):
     with open(os.path.join(path, "script.json"), 'r', encoding='utf-8') as f:
@@ -42,12 +42,13 @@ async def prepare(path):
             if not os.path.exists(path + "/slides/assets"):
                 os.mkdir(path + "/slides/assets")
             url= unsplash_url + script[i]['image'].replace("+", ",")
-            r = requests.get(url)
-            real_url = r.json()['urls']['raw']
+            #r = requests.get(url)
+            #real_url = r.json()['urls']['raw']
+            real_url = url
             with open(path + "/slides/assets/slide" + str(i) + ".jpg", 'wb') as f:
-                f.write(requests.get(real_url).content)
+                f.write(requests.get(real_url, allow_redirects=True).content)
                 f.close()
-            content = marp + f"\n\n![bg 70%](assets/slide{i}.jpg)"
+            content = marp.replace("[imagesrc]", "assets/slide" + str(i) + ".jpg")
             with open(path + "/slides/slide" + str(i) + ".md", 'w', encoding='utf-8') as f:
                 f.write(content)
         elif "wikimage" in script[i]:
@@ -62,7 +63,10 @@ async def prepare(path):
                     print("Trying to download image for slide " + str(i))
                     wiki_download_image(script[i]['wikimage'], os.path.abspath(os.path.join(path, "slides", "assets", "slide" + str(i) + ".jpg")))
                     print("Downloaded image for slide with wikiimage " + str(i))
-                    break
+                    if not os.path.exists(os.path.join(path, "slides", "assets", "slide" + str(i) + ".jpg")):
+                        raise FileNotFoundError
+                    else:
+                        break
                 except:
                     r += 1
                     if r > 5:

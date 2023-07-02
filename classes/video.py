@@ -60,8 +60,8 @@ class Video:
             "title": self.idea['title'],
             "description": self.idea['description'] + "\n\n" + credits,
         }
-        if input("Do you want to generate a thumbnail ? (y/N) : ").lower() == "y":
-            await generate_thumbnail( self.path, self.idea['title'], self.idea['description'])
+        #if input("Do you want to generate a thumbnail ? (y/N) : ").lower() == "y":
+        await generate_thumbnail( self.path, self.idea['title'], self.idea['description'])
         videoid = await upload_video( self.path, self.idea['title'], self.metadata['description'], 28, "", "private", self.parent.path)
         printm(f"Your video is ready! You can find it in { self.path}")
         video_meta_file = {
@@ -71,6 +71,8 @@ class Video:
             "path":  self.path,
             "url": f"https://www.youtube.com/watch?v={videoid}",
         }
+        self.url = video_meta_file['url']
+        self.id = videoid
         with open(os.path.join( self.path, "video.yaml"), "w") as f:
             yaml.dump(video_meta_file, f)
             f.close()

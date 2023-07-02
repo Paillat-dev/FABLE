@@ -22,11 +22,25 @@ def download_image(query, download_path):
                 to.click()
                 break
         time.sleep(1)
-        image = driver.find_element(By.CLASS_NAME, "rg_i")
-        image.click()
+        while True:
+            try:
+                image = driver.find_element(By.CLASS_NAME, "rg_i").click()
+                break
+            except:
+                pass
+            finally:
+                time.sleep(1)
         time.sleep(5)
-        image = driver.find_element(By.CLASS_NAME, "r48jcc").get_attribute("src") or ""
-        
+        while True:
+            try:
+                image = driver.find_element(By.CLASS_NAME, "iPVvYb").get_attribute("src") or driver.find_element(By.CLASS_NAME, "pT0Scc").get_attribute("src") or driver.find_element(By.CLASS_NAME, "r48jcc").get_attribute("src") or ""
+                if image != "":
+                    break
+            except Exception as a:
+                print(a)
+                pass
+            finally:
+                time.sleep(1)            
         image_content = None
 
         if image.startswith("data:"):
