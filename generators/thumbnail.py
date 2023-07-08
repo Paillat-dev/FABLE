@@ -29,7 +29,6 @@ Here is the title of the video: [TITLE]
 Here is the description of the video: [DESCRIPTION]'''
 
 
-# TODO: make jpg qith 90% quality default when generating the image to avoid having to convert it later
 
 
 

@@ -13,8 +13,8 @@ def download_image(query, download_path):
     driver = uc.Chrome(options=options)
 
     try:
-        driver.get(f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=99&q=site:wikipedia.org+{query.replace(' ', '+')}")
         time.sleep(2)
+        driver.get(f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=99&q=site:wikipedia.org+{query.replace(' ', '+')}")
 
         tos = driver.find_elements(By.CLASS_NAME, "VfPpkd-vQzf8d")
         for to in tos:
@@ -22,14 +22,20 @@ def download_image(query, download_path):
                 to.click()
                 break
         time.sleep(1)
-        while True:
+        f = 0
+        while f < 10:
             try:
+                driver.get(f"https://www.google.com/search?site=&tbm=isch&source=hp&biw=1873&bih=99&q=site:wikipedia.org+{query.replace(' ', '+')}")
+
                 image = driver.find_element(By.CLASS_NAME, "rg_i").click()
+                
                 break
             except:
-                pass
+                f += 1
             finally:
                 time.sleep(1)
+        if f == 10:
+                raise Exception("No image found")
         time.sleep(5)
         while True:
             try:
@@ -46,7 +52,10 @@ def download_image(query, download_path):
         if image.startswith("data:"):
             image_content = base64.b64decode(image.split(",")[1])
         else:
-            response = requests.get(image, stream=True)
+            #define a common user agent for all requests
+            headers = {'User-Agent': 'FABLE/1.2 (Website coming soon; me@paillat.dev)'}
+
+            response = requests.get(image, stream=True, headers=headers)
             response.raise_for_status()
             image_content = response.content
 
