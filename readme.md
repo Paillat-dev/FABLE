@@ -40,3 +40,13 @@ Now, you can run the `main.py` script to generate the videos. If it is the first
 
 # Other stuff
 In each channel's folder there will be a `channel.yaml` file with all of the channel's settings. You can change them manually, but you will need to restart the script for the changes to take effect.
+
+# Contributing
+If you want to contribute to this project, you can do so by creating a pull request. You can check the #TODO section below.
+
+# TODO
+[ ] Add a way to change the settings without restarting the script
+[ ] Add a more detailed tutorial on how to use the script & readme
+[ ] Add a generator for more beautiful thumbnails
+[ ] Add a way to change the background music / add a way to add more background music / add a way to have channel specific background music
+[ ] Same as with channel specifis script prompt, also for the marp heading and the oîdeas prompts. Make the optionally channel specific.
