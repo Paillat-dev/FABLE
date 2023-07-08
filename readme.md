@@ -1,8 +1,30 @@
-# Videos Automator
-This repository contains a whole bunch of scripts and tools connected together to automate the process of generatig unlimited videos from a given subject. It handles everything from creating the script, to generating the video, to uploading it to YouTube as well as creating the thumbnail and the description.
+# FABLE
+
+**The *Film and Artistic Bot for Lively Entertainment***
+
+This repository contains a software that connectsa whole bunch of scripts and tools together to automate the process of generatig unlimited videos from a given subject. It handles everything from creating the script, to generating the video, to uploading it to YouTube as well as creating the thumbnail and the description.
+
+# READ THIS FIRST
+This repository is a labor of love, the result of countless hours of work, and a testament to my passion for open-source software. You see, I'm a big fan of open source. I've developed and participated in many such projects, and I believe in the power of community collaboration.
+
+However, for this particular project, there's a twist. While I'm more than happy for you to use, modify, and learn from this software, I've decided to impose certain restrictions on its commercial use. Let me explain why.
+
+In a nutshell, I don't want anyone to make a profit directly from this specific project or the content generated from it. This includes selling the videos created by this software, offering services to generate such videos, or monetizing these videos on any online platform (think YouTube, Twitch, Patreon, and so forth).
+
+The reason is simple. This project was created out of passion, not for profit, and I want to ensure that it is used in the spirit it was created in. It's about learning, sharing knowledge, and having fun while doing so. It's not about turning a quick profit.
+
+In the spirit of clarity, even a small part of the code used elsewhere still falls under these rules. So, if you're thinking of using just a tiny piece of the code for commercial purposes, please think again. The terms are pretty straightforward - use the software, enjoy it, but don't profit from it.
+
+And lastly, when using this software, I'd appreciate it if you mention me, Paillat-dev (https://paillat.dev), in any licensing or attribution notes. It's a small ask that goes a long way in supporting individual developers like me.
+
+Now, with all that said, I hope you enjoy exploring this project as much as I did creating it. Your support means the world to me, and I can't wait to see what amazing things you do with it (within the rules, of course 😉).
+
+Happy coding!
+
+***For more detailed information about the license conditions, please refer to the LICENSE file in the root directory of this project.***
 
 # Getting Started
-:warning: <strong> This is not a tutorial on how to use the scripts. You will need to know how to use the command line and how to install dependencies, <ins>as well as some knowledge on how to look for other tutorials on the internet if you get stuck.</ins></strong>
+:warning: <strong> This is not a tutorial on how to use the software. You will need to know how to use the command line and how to install dependencies, <ins>as well as some knowledge on how to look for other tutorials on the internet if you get stuck.</ins></strong>
 
 If it is the first time you are using this repository, you will need to install the dependencies. To do so, run the following command:
 ```
