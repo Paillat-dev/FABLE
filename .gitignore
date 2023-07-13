@@ -155,7 +155,7 @@ cython_debug/
 #Venv directory
 youtuber/
 
-#results
+#custom
 videos/
 test/
 ideas/
@@ -163,3 +163,4 @@ montageTEMP_MPY_wvf_snd.mp3
 marp.exe
 channels/
 bark_cache/
+settings.yaml
