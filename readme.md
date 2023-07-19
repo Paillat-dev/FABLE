@@ -51,3 +51,7 @@ If you want to contribute to this project, you can do so by creating a pull requ
 - [ ] Add a way to change the background music / add a way to add more background music / add a way to have channel specific background music
 - [ ] Same as with channel specifis script prompt, also for the marp heading and the oîdeas prompts. Make the optionally channel specific.
 - [ ] Add a global settings dict with all of the settings, and a listener to changes in the settings file, to akkow changing the settings without restarting the script. Also allow all te settings to be passed as cli arguments.
+- [ ] Add transtitions between photos
+- [ ] Add generation of a video from a given text
+- [ ] Add a way to add a watermark to the video
+- [ ] Add a way to choose / make the AI choose the background image to the marp slides
