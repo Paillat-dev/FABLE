@@ -55,3 +55,4 @@ If you want to contribute to this project, you can do so by creating a pull requ
 - [ ] Add generation of a video from a given text
 - [ ] Add a way to add a watermark to the video
 - [ ] Add a way to choose / make the AI choose the background image to the marp slides
+- [ ] Ability to change speaker file or set it to no speaker file per channel option.
