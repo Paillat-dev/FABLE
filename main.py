@@ -9,7 +9,8 @@ from utils.config import loadingmessage, bcolors
 from utils.misc import clear_screen, printm, getenv
 from utils.openaicaller import openai
 from utils.license import check_license_agreement
- 
+from utils.marpdownloader import download_marp_cli
+
 logging.basicConfig(level=logging.INFO)
 
 async def main():
@@ -20,6 +21,10 @@ async def main():
     printm("Welcome in FABLE, the Film and Artistic Bot for Lively Entertainment!")
     await asyncio.sleep(0.5)
     printm(f"This program will generate for you complete {bcolors.FAIL}{bcolors.BOLD}YouTube{bcolors.ENDC} videos, as well as uploading them to YouTube.")
+    printm("Please wait until we have downloaded the necessary files...")
+    await asyncio.sleep(0.5)
+    download_marp_cli(force_download=bool(settings.force_download_marp_cli))
+    settings.set_setting('force_download_marp_cli', False)
     if not os.path.exists('env.yaml'):
         printm("It looks like you don't have an OpenAI API key yet. Please paste it here:")
         openai_api_key = input("Paste the key here: ")
