@@ -87,18 +87,28 @@ async def main():
         channel = Channel()
         await channel.create()
     else:
-        printm("Here are your channels:")
-        for i, channel in enumerate(channels):
-            printm(f"{i+1}. {channel}")
-        printm(f"{len(channels)+1}. Create a new channel")
-        index = input("Which channel do you want to use : ")
-        if index == str(len(channels)+1):
-            channel = Channel()
-            await channel.create()
-        else:
-            channel_name = channels[int(index)-1]
+        if settings.skip_channel_default != None:
+            if type(settings.skip_channel_default) == str:
+                channel_name = settings.skip_channel_default
+            elif type(settings.skip_channel_default) == int:
+                channel_name = channels[settings.skip_channel_default]
+            else:
+                raise TypeError("The skip_channel_default setting must be either a string or an integer.")
             channel = Channel()
             await channel.load(channel_name)
+        else:
+            printm("Here are your channels:")
+            for i, channel in enumerate(channels):
+                printm(f"{i+1}. {channel}")
+            printm(f"{len(channels)+1}. Create a new channel")
+            index = input("Which channel do you want to use : ")
+            if index == str(len(channels)+1):
+                channel = Channel()
+                await channel.create()
+            else:
+                channel_name = channels[int(index)-1]
+                channel = Channel()
+                await channel.load(channel_name)
     printm("Now, let's create a video!")
     printm("Here are all the ideas you have:")
     printm("0. Generate new ideas")
