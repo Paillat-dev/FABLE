@@ -26,61 +26,13 @@ class realbcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+def replace_markdown_bold(text):
+    splitted = text.split('**')
+    #add bold after even occurences of ** and add endc after odd occurences. But attention, sometimes the string has nothing in
 def printm(*args, **kwargs):
-    result = ''
-    underline_counter = 0
-    bold_counter = 0
     sep = kwargs.get('sep', ' ')
     text = sep.join([str(arg) for arg in args])
-    i = 0
-    while i < len(text):
-        if text[i:].startswith('$***'):
-            result += text[i:i+4].replace('$', '')
-            i += 4
-            continue
-        elif text[i:].startswith('$**'):
-            result += text[i:i+3].replace('$', '')
-            i += 3
-            continue
-        elif text[i:].startswith('$*'):
-            result += text[i:i+2].replace('$', '')
-            i += 2
-            continue
-        elif text[i:].startswith('***'):
-            if bold_counter % 2 == 0 and underline_counter % 2 == 0:
-                result += bcolors.BOLD + bcolors.UNDERLINE
-            elif bold_counter % 2 == 0:
-                result += bcolors.BOLD
-            elif underline_counter % 2 == 0:
-                result += bcolors.UNDERLINE
-            else:
-                result += bcolors.ENDC
-            i += 3
-            bold_counter += 1
-            underline_counter += 1
-            continue
-        elif text[i:].startswith('**'):
-            if bold_counter % 2 == 0:
-                result += bcolors.BOLD
-            else:
-                result += bcolors.ENDC
-            i += 2
-            bold_counter += 1
-            continue
-        elif text[i:].startswith('*'):
-            if underline_counter % 2 == 0:
-                result += bcolors.UNDERLINE
-            else:
-                result += bcolors.ENDC
-            i += 1
-            underline_counter += 1
-            continue
-
-        result += text[i]
-        i += 1
-
-    result += bcolors.ENDC  # Ensure the formatting is reset at the end
-
+    #bold processing
     print(text, **kwargs)
 
 def getenv(var, default=None):
