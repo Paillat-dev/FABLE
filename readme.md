@@ -1,3 +1,4 @@
+# ⚠️This is archived, but check out [viralfactory](https://github.com/Paillat-dev//viralfactory)
 # FABLE
 
 **The *Film and Artistic Bot for Lively Entertainment***
